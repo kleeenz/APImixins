@@ -1,8 +1,9 @@
-from django.shortcuts import render
-from .serializer import myModserial
+from django.contrib.auth.models import User
+from .serializer import myModserial, personSerial
 from .models import myMod
 from rest_framework import mixins
 from rest_framework import generics
+from rest_framework import permissions
 
 
 class myModList(mixins.ListModelMixin,
@@ -28,5 +29,20 @@ class myModList(mixins.ListModelMixin,
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+
+
+class person_list(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = myMod.objects.all()
+    serializer_class = personSerial
+
+    def perform_create(self, serializer):
+        serializer.save(person = self.request.user)
+
+
+class persondetails(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = myMod.objects.all()
+    serializer_class = personSerial
 
 
